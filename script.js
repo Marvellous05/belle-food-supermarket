@@ -1,159 +1,1503 @@
 /* =========================================================
    BELLE FOOD & SUPERMARKET
-   EASY SETTINGS: edit only the values below.
+   ORGANIZED RESPONSIVE STYLESHEET
    ========================================================= */
-const SITE = {
-  logo: "assets/logo.png",
-  whatsapp: "2349119006385",
-  maps: "https://maps.app.goo.gl/nxdAizw2jKDqEXv66",
 
-  frozen_image: "assets/frozenImage.jpg",
-  location_image: "assets/storeDay.jpg",
-  belle_food: "assets/storeDay.jpg",
-  fresh_tasty: "assets/jollof.jpg",
-  good_food: "assets/noodles.jpg",
-  always_here: "assets/storeNight.jpg",
-  banga: "assets/banga.jpg"
-};
 
-const VIDEO_ROOT = "assets/";
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* =========================================================
+   1. ROOT VARIABLES
+   ========================================================= */
 
-function applyConfig(){
-
-  // LOGO
-  document.querySelectorAll("[data-logo]").forEach(img => {
-    img.src = SITE.logo;
-  });
-
-  // FROZEN FOODS
-  document.querySelectorAll("[data-frozen-image]").forEach(img => {
-    img.src = SITE.frozen_image;
-  });
-
-  // LOCATION
-  document.querySelectorAll("[data-location-image]").forEach(img => {
-    img.src = SITE.location_image;
-  });
-
-  // BELLE FOOD
-  document.querySelectorAll("[data-belle-food]").forEach(img => {
-    img.src = SITE.belle_food;
-  });
-
-  // FRESH & TASTY
-  document.querySelectorAll("[data-fresh-tasty]").forEach(img => {
-    img.src = SITE.fresh_tasty;
-  });
-
-  // GOOD FOOD
-  document.querySelectorAll("[data-good-food]").forEach(img => {
-    img.src = SITE.good_food;
-  });
-
-  // 24/7 ALWAYS HERE
-  document.querySelectorAll("[data-always-here]").forEach(img => {
-    img.src = SITE.always_here;
-  });
-
-  // STARCH & BANGA
-  document.querySelectorAll("[data-banga]").forEach(img => {
-    img.src = SITE.banga;
-  });
-
-  // MAPS
-  const maps = document.getElementById("maps");
-  if (maps) maps.href = SITE.maps;
-
-  // YEAR
-  const year = document.getElementById("year");
-  if (year) year.textContent = new Date().getFullYear();
+:root {
+    --orange: hwb(26 13% 4%);
+    --red: #b72822;
+    --ink: #211916;
+    --muted: #756b66;
+    --cream: #fff9f3;
+    --line: #eadfd7;
+    --white: #fff;
+    --shadow: 0 24px 70px rgba(33, 25, 22, .10);
 }
 
-function setupVideos(){
-  const videos=[...document.querySelectorAll("video[data-video]")];
-  videos.forEach(video=>{
-    const source=document.createElement("source");
-    source.src=VIDEO_ROOT+video.dataset.video;
-    source.type="video/mp4";
-    video.appendChild(source);
-    video.muted=true;
-    video.defaultMuted=true;
-    video.loop=true;
-    video.playsInline=true;
-    video.addEventListener("loadeddata",()=>video.closest(".media,.food-media,.super-media")?.classList.add("is-loaded"),{once:true});
-    video.addEventListener("error",()=>video.closest(".media,.food-media,.super-media")?.classList.remove("is-loaded"));
-  });
 
-  const hero=document.querySelector(".hero-video");
-  if(hero){ hero.play().catch(()=>{}); }
+/* =========================================================
+   2. GLOBAL
+   ========================================================= */
 
-  const observer=new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-      const v=entry.target;
-      if(entry.isIntersecting){
-        v.play().catch(()=>{});
-      }else if(!v.classList.contains("hero-video")){
-        v.pause();
-      }
-    });
-  },{rootMargin:"180px 0px",threshold:.08});
-  videos.forEach(v=>observer.observe(v));
+* {
+    box-sizing: border-box;
 }
 
-function setupNav(){
-  const menu=document.querySelector(".menu");
-  const mobile=document.querySelector(".mobile-nav");
-  if(!menu||!mobile) return;
-  menu.addEventListener("click",()=>{
-    const open=mobile.classList.toggle("open");
-    menu.setAttribute("aria-expanded",String(open));
-    mobile.setAttribute("aria-hidden",String(!open));
-  });
-  mobile.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{
-    mobile.classList.remove("open");
-    menu.setAttribute("aria-expanded","false");
-    mobile.setAttribute("aria-hidden","true");
-  }));
+html {
+    scroll-behavior: smooth;
 }
 
-function openWhatsApp(message){
-  const digits=SITE.whatsapp.replace(/\D/g,"");
-  if(!digits || digits.includes("XXXXXXXX")){
-    showToast("Add Belle Food's WhatsApp number in script.js first.");
-    return;
-  }
-  window.open(`https://wa.me/${digits}?text=${encodeURIComponent(message)}`,"_blank","noopener");
+body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "DM Sans", sans-serif;
+    line-height: 1.55;
 }
 
-function setupOrders(){
-  document.querySelectorAll(".wa").forEach(btn=>btn.addEventListener("click",()=>{
-    const type=btn.dataset.type;
-    openWhatsApp(type==="restaurant" ? "Hello Belle Food! I would like to order food. Please share today's available options and prices." : "Hello Belle Food! I would like to place a supermarket order. Please let me know what's available and the prices.");
-  }));
-  document.querySelectorAll(".dish").forEach(btn=>btn.addEventListener("click",()=>{
-    openWhatsApp(`Hello Belle Food! I would like to order ${btn.dataset.item}. Please confirm availability and price.`);
-  }));
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
-function showToast(text){
-  const toast=document.querySelector(".toast");
-  if(!toast) return;
-  toast.textContent=text;
-  toast.classList.add("show");
-  clearTimeout(showToast.timer);
-  showToast.timer=setTimeout(()=>toast.classList.remove("show"),2800);
+button {
+    font: inherit;
 }
 
-function setupReveal(){
-  const items=[...document.querySelectorAll(".reveal")];
-  if(reduceMotion){items.forEach(x=>x.classList.add("visible"));return;}
-  const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");observer.unobserve(e.target)}}),{threshold:.08,rootMargin:"0px 0px -35px"});
-  items.forEach(x=>observer.observe(x));
+video,
+img {
+    display: block;
 }
 
-applyConfig();
-setupVideos();
-setupNav();
-setupOrders();
-setupReveal();
+
+/* =========================================================
+   3. ANNOUNCEMENT BAR
+   ========================================================= */
+
+.announcement {
+    min-height: 34px;
+    background: var(--red);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5vw;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.announcement span {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.announcement i {
+    font-style: normal;
+}
+
+
+/* =========================================================
+   4. HEADER
+   ========================================================= */
+
+.header {
+    height: 78px;
+    padding: 0 5vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 249, 243, .94);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    border-bottom: 1px solid rgba(234, 223, 215, .7);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.brand-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--line);
+}
+
+.brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 3px;
+}
+
+.brand-logo img.broken {
+    display: none;
+}
+
+.brand-name {
+    display: grid;
+    line-height: 1;
+}
+
+.brand-name strong {
+    font-size: 15px;
+    letter-spacing: .07em;
+}
+
+.brand-name small {
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: .16em;
+    margin-top: 4px;
+}
+
+.desktop-nav {
+    display: flex;
+    gap: 28px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.desktop-nav a:hover,
+.links a:hover {
+    color: var(--orange);
+}
+
+
+/* =========================================================
+   5. BUTTONS
+   ========================================================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 0;
+    border-radius: 999px;
+    padding: 13px 20px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.btn span {
+    font-size: 15px;
+}
+
+.btn-orange {
+    background: var(--orange);
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(244, 123, 32, .22);
+}
+
+.btn-orange:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(244, 123, 32, .28);
+}
+
+.btn-light {
+    background: #fff;
+    border: 1px solid var(--line);
+}
+
+.btn-dark {
+    background: var(--ink);
+    color: #fff;
+}
+
+
+/* =========================================================
+   6. MOBILE MENU
+   ========================================================= */
+
+.menu {
+    display: none;
+    background: none;
+    border: 0;
+    width: 42px;
+    height: 42px;
+}
+
+.menu span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--ink);
+    margin: 5px auto;
+}
+
+.mobile-nav {
+    display: none;
+}
+
+
+/* =========================================================
+   7. HERO
+   ========================================================= */
+
+.hero {
+    max-width: 1400px;
+    margin: auto;
+    min-height: 650px;
+    padding: 70px 5vw 60px;
+    display: grid;
+    grid-template-columns: .82fr 1.18fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.eyebrow,
+.section-kicker {
+    font-size: 11px;
+    letter-spacing: .16em;
+    font-weight: 700;
+    color: var(--red);
+    text-transform: uppercase;
+}
+
+.eyebrow {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.eyebrow b {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--orange);
+    display: block;
+}
+
+.hero h1,
+.intro h2,
+.heading h2,
+.super h2,
+.frozen h2,
+.order h2,
+.visit h2,
+.feature-copy h2,
+.social h2 {
+    font-family: "Playfair Display", serif;
+    line-height: .98;
+    margin: 0;
+}
+
+.hero h1 {
+    font-size: clamp(48px, 6vw, 86px);
+    letter-spacing: -.04em;
+}
+
+.hero h1 em {
+    color: var(--orange);
+    font-style: normal;
+}
+
+.hero-copy > p {
+    max-width: 520px;
+    color: var(--muted);
+    font-size: 16px;
+    margin: 25px 0;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.trust {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 22px;
+}
+
+.trust span {
+    color: var(--orange);
+}
+
+.trust i {
+    font-style: normal;
+    margin: 0 6px;
+    color: #b9aca4;
+}
+
+
+/* =========================================================
+   8. MEDIA / VIDEO
+   ========================================================= */
+
+.media,
+.food-media,
+.super-media,
+.frozen-img,
+.feature-image {
+    position: relative;
+    overflow: hidden;
+    background: #ddd;
+    border-radius: 28px;
+}
+
+.hero-media {
+    min-height: 570px;
+    box-shadow: var(--shadow);
+}
+
+.hero-video,
+.food-media video,
+.super-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-video {
+    position: absolute;
+    inset: 0;
+}
+
+.media-fallback,
+.image-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    background: linear-gradient(145deg, #f7d2b4, #8e3a25);
+    color: #fff;
+    font-family: "Playfair Display", serif;
+    font-size: 28px;
+    letter-spacing: .02em;
+}
+
+.media-fallback small {
+    display: block;
+    font-family: "DM Sans", sans-serif;
+    font-size: 11px;
+    letter-spacing: .12em;
+    margin-top: 8px;
+}
+
+.media.is-loaded .media-fallback,
+.food-media.is-loaded .media-fallback,
+.super-media.is-loaded .media-fallback,
+.frozen-img.is-loaded .image-fallback,
+.feature-image.is-loaded .image-fallback {
+    display: none;
+}
+
+.hero-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, .02),
+        rgba(0, 0, 0, .52)
+    );
+}
+
+.hero-card {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 24px;
+    background: rgba(255, 255, 255, .92);
+    padding: 16px 18px;
+    border-radius: 18px;
+    display: grid;
+    gap: 2px;
+}
+
+.hero-card small {
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: .13em;
+    font-weight: 700;
+}
+
+.hero-card b {
+    font-family: "Playfair Display", serif;
+    font-size: 23px;
+}
+
+.hero-card span {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   9. TICKER
+   ========================================================= */
+
+.ticker {
+    background: var(--ink);
+    color: #fff;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.ticker > div {
+    display: inline-block;
+    padding: 13px 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    animation: ticker 32s linear infinite;
+}
+
+.ticker i {
+    color: var(--orange);
+    font-style: normal;
+    margin: 0 17px;
+}
+
+@keyframes ticker {
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+
+/* =========================================================
+   10. GENERAL SECTIONS
+   ========================================================= */
+
+.section {
+    max-width: 1400px;
+    margin: auto;
+    padding: 105px 5vw;
+}
+
+.intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-top: 18px;
+}
+
+.intro h2 {
+    font-size: clamp(44px, 5vw, 70px);
+}
+
+h2 span {
+    color: var(--orange);
+}
+
+.intro-grid p,
+.heading > p,
+.super-copy > p,
+.frozen-copy > p,
+.order-copy > p,
+.visit-copy > p,
+.feature-copy > p,
+.center p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+}
+
+.text-link {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+    border-bottom: 1px solid var(--orange);
+    padding-bottom: 5px;
+    display: inline-flex;
+    gap: 9px;
+    margin-top: 10px;
+}
+
+.text-link:hover {
+    color: var(--orange);
+}
+
+.heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 30px;
+    margin-bottom: 38px;
+}
+
+.heading h2,
+.super h2,
+.frozen h2,
+.order h2,
+.visit h2,
+.feature-copy h2 {
+    font-size: clamp(40px, 4.5vw, 62px);
+    margin-top: 10px;
+}
+
+.heading > p {
+    margin: 0;
+    text-align: right;
+}
+
+
+/* =========================================================
+   11. FOOD GRID
+   ========================================================= */
+
+.food-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.food-media {
+    aspect-ratio: 4 / 5;
+}
+
+.food-media video {
+    position: absolute;
+    inset: 0;
+}
+
+.food-media:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        transparent 45%,
+        rgba(0, 0, 0, .55)
+    );
+}
+
+.food-media .number {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, .88);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    font-weight: 800;
+    z-index: 2;
+}
+
+.food-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 15px 3px;
+}
+
+.food-info small {
+    font-size: 9px;
+    color: var(--red);
+    font-weight: 800;
+}
+
+.food-info h3 {
+    margin: 3px 0 0;
+    font-family: "Playfair Display", serif;
+    font-size: 18px;
+    line-height: 1.1;
+}
+
+.dish {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    height: 35px;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.dish:hover {
+    background: var(--orange);
+    color: #fff;
+    border-color: var(--orange);
+}
+
+.more {
+    border-top: 1px solid var(--line);
+    margin-top: 45px;
+    padding-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.plus {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--orange);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 25px;
+}
+
+.more strong {
+    font-family: "Playfair Display", serif;
+    font-size: 21px;
+}
+
+.more p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.more .text-link {
+    margin-left: auto;
+}
+
+
+/* =========================================================
+   12. STARCH & BANGA FEATURE
+   ========================================================= */
+
+.feature-food {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 70px;
+    align-items: center;
+    padding-top: 30px;
+}
+
+.feature-image {
+    min-height: 460px;
+    position: relative !important;
+}
+
+.feature-image img {
+    position: relative !important;
+    z-index: 2 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: 500px !important;
+    object-fit: cover !important;
+    width: 100%;
+}
+
+.feature-copy p {
+    margin: 25px 0;
+}
+
+
+/* =========================================================
+   13. SUPERMARKET
+   ========================================================= */
+
+.super {
+    background: var(--white);
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 80px;
+    align-items: center;
+    padding-left: 8vw;
+    padding-right: 8vw;
+}
+
+.super-media {
+    min-height: 0 !important;
+    height: 500px !important;
+    aspect-ratio: auto !important;
+    border-radius: 30px;
+}
+
+.super-media video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.super-media .circle {
+    position: absolute;
+    right: 22px;
+    top: 22px;
+    background: var(--orange);
+    color: #fff;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    z-index: 2;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .18);
+}
+
+.circle b {
+    font-family: "Playfair Display", serif;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.circle small {
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--line);
+    margin-top: 30px;
+}
+
+.categories > div {
+    padding: 17px 10px 17px 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 35px 1fr;
+    gap: 0 10px;
+}
+
+.categories b {
+    font-size: 10px;
+    color: var(--orange);
+}
+
+.categories strong {
+    font-size: 13px;
+}
+
+.categories small {
+    grid-column: 2;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.super-copy .text-link {
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   14. FROZEN FOODS
+   ========================================================= */
+
+.frozen {
+    display: grid;
+    grid-template-columns: .85fr 1.15fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.frozen-img {
+    min-height: 430px;
+}
+
+.frozen-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+}
+
+.frozen-copy p {
+    margin: 25px 0;
+}
+
+
+/* =========================================================
+   15. ORDER / WHATSAPP
+   ========================================================= */
+
+.order {
+    background: var(--red);
+    color: #fff;
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding-left: 10vw;
+    padding-right: 10vw;
+}
+
+.order .section-kicker {
+    color: #ffd1ad;
+}
+
+.order h2 span {
+    color: #ffb26e;
+}
+
+.order-copy > p {
+    color: rgba(255, 255, 255, .75);
+}
+
+.order-buttons {
+    display: grid;
+    gap: 10px;
+}
+
+.wa {
+    border: 0;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 18px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 46px 1fr auto;
+    align-items: center;
+    text-align: left;
+    gap: 14px;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.wa:hover {
+    transform: translateY(-2px);
+}
+
+.wa-icon,
+.cart-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #25d366;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.cart-icon {
+    background: var(--orange);
+    font-size: 24px;
+}
+
+.wa small {
+    display: block;
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: .1em;
+    font-weight: 800;
+}
+
+.wa strong {
+    display: block;
+    font-size: 14px;
+}
+
+.wa > b {
+    font-size: 20px;
+}
+
+.order-note {
+    color: rgba(255, 255, 255, .62);
+    font-size: 11px;
+    text-align: right;
+}
+
+
+/* =========================================================
+   16. LOCATION
+   ========================================================= */
+
+.visit {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.address {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 25px 0;
+}
+
+.address > span {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    color: var(--orange);
+}
+
+.address strong,
+.address small {
+    display: block;
+}
+
+.address strong {
+    font-size: 13px;
+}
+
+.address small {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+.visit-art {
+    width: 100%;
+    height: 300px;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+}
+
+.visit-art img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   17. WHAT'S COOKING
+   ========================================================= */
+
+.social {
+    padding-top: 50px;
+}
+
+.center {
+    text-align: center;
+}
+
+.center h2 {
+    font-size: clamp(45px, 5vw, 65px);
+    margin: 9px 0;
+}
+
+.center p {
+    margin: 0 auto;
+}
+
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+    margin: 45px 0 70px;
+    padding: 0;
+}
+
+.social-card {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px;
+    box-sizing: border-box;
+    background: #211916;
+}
+
+.social-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    z-index: 0;
+    transition: transform .5s ease;
+}
+
+.social-card:hover img {
+    transform: scale(1.06);
+}
+
+.social-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, .78) 0%,
+        rgba(0, 0, 0, .35) 45%,
+        rgba(0, 0, 0, .05) 100%
+    );
+    z-index: 1;
+}
+
+.social-card span {
+    position: relative;
+    z-index: 2;
+    display: block;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 0 0 6px;
+}
+
+.social-card small {
+    position: relative;
+    z-index: 2;
+    display: block;
+    color: rgba(255, 255, 255, .9);
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+
+/* =========================================================
+   18. FOOTER
+   ========================================================= */
+
+footer {
+    background: var(--ink);
+    color: #fff;
+    padding: 55px 5vw 20px;
+}
+
+.foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.foot .brand-name strong {
+    color: #fff;
+}
+
+.foot p {
+    color: #bfb2aa;
+    font-size: 12px;
+}
+
+.links {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+}
+
+.bottom {
+    border-top: 1px solid rgba(255, 255, 255, .12);
+    margin-top: 35px;
+    padding-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    color: #9f938c;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   19. TOAST
+   ========================================================= */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 25px;
+    transform: translate(-50%, 20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 11px 16px;
+    border-radius: 999px;
+    font-size: 11px;
+    opacity: 0;
+    pointer-events: none;
+    transition: .25s;
+    z-index: 50;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* =========================================================
+   20. REVEAL ANIMATION
+   ========================================================= */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .65s ease, transform .65s ease;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: none;
+}
+
+
+/* =========================================================
+   21. TABLET
+   980px AND BELOW
+   ========================================================= */
+
+@media (max-width: 980px) {
+
+    .desktop-nav,
+    .header-cta {
+        display: none;
+    }
+
+    .menu {
+        display: block;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+        padding-top: 45px;
+        gap: 35px;
+    }
+
+    .hero-media {
+        min-height: 500px;
+    }
+
+    .food-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .super,
+    .frozen,
+    .visit,
+    .feature-food,
+    .order {
+        grid-template-columns: 1fr;
+        gap: 45px;
+    }
+
+    .super {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+
+    .super-media {
+        min-height: 0 !important;
+        height: 500px !important;
+    }
+
+    .social-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .intro-grid {
+        gap: 40px;
+    }
+
+    .heading {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .heading > p {
+        text-align: left;
+    }
+
+    .more {
+        flex-wrap: wrap;
+    }
+
+    .more .text-link {
+        margin-left: 0;
+    }
+
+    .foot {
+        flex-wrap: wrap;
+    }
+
+    .bottom {
+        gap: 15px;
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================================
+   22. PHONES
+   640px AND BELOW
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    .announcement {
+        padding: 0 4vw;
+        font-size: 9px;
+    }
+
+    .announcement span:last-child {
+        display: none;
+    }
+
+    .header {
+        height: 68px;
+        padding: 0 4vw;
+    }
+
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .brand-name strong {
+        font-size: 13px;
+    }
+
+    .brand-name small {
+        font-size: 8px;
+    }
+
+    .mobile-nav {
+        position: fixed;
+        top: 102px;
+        left: 12px;
+        right: 12px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 14px;
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+        z-index: 19;
+        box-shadow: var(--shadow);
+    }
+
+    .mobile-nav.open {
+        display: flex;
+    }
+
+    .mobile-nav a:not(.btn) {
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .mobile-nav a:not(.btn):hover {
+        background: var(--cream);
+    }
+
+    .hero {
+        padding: 38px 4vw 45px;
+        min-height: auto;
+    }
+
+    .hero h1 {
+        font-size: 52px;
+    }
+
+    .hero-copy > p {
+        font-size: 14px;
+    }
+
+    .hero-media {
+        min-height: 440px;
+        border-radius: 22px;
+    }
+
+    .hero-card {
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+    }
+
+    .section {
+        padding: 75px 4vw;
+    }
+
+    .intro-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .food-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .food-media {
+        border-radius: 18px;
+    }
+
+    .food-info {
+        display: block;
+        padding: 10px 1px;
+    }
+
+    .food-info h3 {
+        font-size: 16px;
+    }
+
+    .dish {
+        margin-top: 8px;
+    }
+
+    .more {
+        margin-top: 30px;
+    }
+
+    .feature-image,
+    .frozen-img {
+        min-height: 340px;
+    }
+
+    .super {
+        gap: 35px;
+    }
+
+    .super-media {
+        min-height: 0 !important;
+        height: 430px !important;
+        border-radius: 22px;
+    }
+
+    .categories {
+        margin-top: 22px;
+    }
+
+    .order {
+        padding-left: 7vw;
+        padding-right: 7vw;
+    }
+
+    .order-note {
+        text-align: left;
+    }
+
+    .visit-art {
+        height: 300px;
+        min-height: 0;
+    }
+
+    .social-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 70px;
+    }
+
+    .social-card {
+        height: 220px;
+        border-radius: 17px;
+        padding: 16px;
+    }
+
+    .social-card span {
+        font-size: 14px;
+    }
+
+    .social-card small {
+        font-size: 10px;
+        line-height: 1.35;
+    }
+
+    .links {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .bottom span {
+        display: block;
+    }
+
+    .ticker > div {
+        animation-duration: 25s;
+    }
+}
+
+
+/* =========================================================
+   23. VERY SMALL PHONES
+   380px AND BELOW
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .announcement {
+        font-size: 8px;
+    }
+
+    .brand-name strong {
+        font-size: 12px;
+    }
+
+    .hero h1 {
+        font-size: 46px;
+    }
+
+    .hero-media {
+        min-height: 400px;
+    }
+
+    .food-grid {
+        gap: 8px;
+    }
+
+    .feature-image,
+    .frozen-img {
+        min-height: 300px;
+    }
+
+    .super-media {
+        height: 390px !important;
+    }
+
+    .social-grid {
+        gap: 9px;
+        margin-bottom: 70px;
+    }
+
+    .social-card {
+        height: 195px;
+        padding: 13px;
+        border-radius: 15px;
+    }
+
+    .social-card span {
+        font-size: 13px;
+    }
+
+    .social-card small {
+        font-size: 9px;
+    }
+
+    .visit-art {
+        height: 270px;
+    }
+}
+
+
+/* =========================================================
+   24. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    .ticker > div {
+        animation: none;
+    }
+
+    .reveal {
+        transition: none;
+    }
+
+    .social-card img {
+        transition: none;
+    }
+}
